@@ -1,4 +1,4 @@
-import { Memory } from '@root/index'
+import { Memory } from '../lib/index'
 
 const memory = new Memory(2, 1)
 
