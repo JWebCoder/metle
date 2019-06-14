@@ -1,0 +1,50 @@
+{
+  "name": "metle",
+  "version": "0.0.1",
+  "description": "memory storage with ttl and reset after request quantity",
+  "main": "lib/index.js",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "type-check:watch": "npm run type-check -- --watch",
+    "clean": "rimraf lib",
+    "lint": "tslint src/**/*.ts",
+    "build": "npm run lint && npm run clean && npm run build:types && npm run build:js",
+    "build:types": "tsc --emitDeclarationOnly",
+    "build:js": "babel src --out-dir lib --extensions \".ts,.tsx\" --source-maps inline",
+    "test": "jest --coverage --forceExit && codecov"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/JWebCoder/metle.git"
+  },
+  "keywords": [
+    "memory",
+    "storage",
+    "ttl",
+    "request",
+    "reset"
+  ],
+  "author": "João Moura",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/JWebCoder/metle/issues"
+  },
+  "homepage": "https://github.com/JWebCoder/metle#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
+    "@babel/plugin-proposal-object-rest-spread": "^7.4.4",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/jest": "^24.0.14",
+    "@types/node": "^12.0.8",
+    "babel-plugin-module-resolver": "^3.2.0",
+    "codecov": "^3.5.0",
+    "jest": "^24.8.0",
+    "rimraf": "^2.6.3",
+    "ts-jest": "^24.0.2",
+    "tslint": "^5.17.0",
+    "typescript": "^3.5.2"
+  }
+}

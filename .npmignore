@@ -60,4 +60,12 @@ typings/
 # next.js build output
 .next
 
-lib
+src
+test
+.gitignore
+.babelrc
+.travis.yml
+.jest.config.ts
+LICENSE
+tsconfig.json
+tslint.json
