@@ -1,6 +1,6 @@
 {
   "name": "metle",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "memory storage with ttl and reset after request quantity",
   "main": "lib/index.js",
   "engines": {
