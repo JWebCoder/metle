@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "description": "memory storage with ttl and reset after request quantity",
   "main": "lib/index.js",
+  "engines": {
+    "node": ">=9.11.1"
+  },
   "scripts": {
     "type-check": "tsc --noEmit",
     "type-check:watch": "npm run type-check -- --watch",

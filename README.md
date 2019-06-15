@@ -1,9 +1,17 @@
-Metle
-======
-**Metle** is a memory storage for NodeJS.
+#Metle
+
+[![Build Status][travis-badge]][travis]
+[![codecov][codecov-badge]][codecov]
+![node][node]
+[![npm version][npm-badge]][npm]
+[![devDependencies Status][dev-dependencies-badge]][dev-dependencies]
+[![PRs Welcome][prs-badge]][prs]
+[![GitHub][license-badge]][license]
+
+**Metle** is a memory storage for NodeJS that supports caching with TTL and maximum number of requests to keep the cache up to date.
 
 ## Install
-```
+```node
 npm install metle
 ```
 
@@ -22,7 +30,7 @@ const foo = metle.getItem('foo')
 ```node
 import { Metle } from 'metle'
 
-const metleInstance = new Metle()
+const metleInstance = new Metle({TTL: 2, maxRequest: 50})
 metle.setItem('foo', 'bar')
 
 const foo = metle.getItem('foo')
@@ -49,5 +57,22 @@ interface ITimers {
 }
 ```
 
-## License 
-* see [LICENSE](https://github.com/JWebCoder/metle/blob/master/LICENSE) file
+[travis-badge]: https://travis-ci.com/JWebCoder/metle.svg?branch=master
+[travis]: https://travis-ci.com/JWebCoder/metle
+
+[codecov-badge]: https://codecov.io/gh/JWebCoder/metle/branch/master/graph/badge.svg
+[codecov]: https://codecov.io/gh/JWebCoder/metle
+
+[node]: https://img.shields.io/node/v/metle.svg
+
+[npm-badge]: https://badge.fury.io/js/metle.svg
+[npm]: https://badge.fury.io/js/metle
+
+[dev-dependencies-badge]: https://david-dm.org/JWebCoder/metle/dev-status.svg
+[dev-dependencies]: https://david-dm.org/JWebCoder/metle?type=dev
+
+[prs-badge]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
+[prs]: http://makeapullrequest.com
+
+[license-badge]: https://img.shields.io/github/license/JWebCoder/metle.svg
+[license]: https://github.com/JWebCoder/metle/blob/master/LICENSE
