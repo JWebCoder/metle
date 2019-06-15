@@ -8,77 +8,92 @@ interface ITimersFinal {
   maxRequest: number,
 }
 
-export class Memory {
+export class Metle {
   private storage: {
     [key: string]: {
       requestCounter: number,
       value: any
-      timeoutId: NodeJS.Timeout,
+      timeoutId?: NodeJS.Timeout,
       maxRequest: number,
     }
   } = {}
-  private totalRequests: number = 10
+  private maxRequest: number = 10
   private TTL: number = 10 * 60 * 1000
 
-  constructor(totalRequests?: number, TTL?: number) {
-    if (totalRequests || totalRequests === 0) {
-      this.totalRequests = totalRequests
+  constructor(timers?: ITimers) {
+    if (timers && (timers.maxRequest || timers.maxRequest === 0)) {
+      this.maxRequest = timers.maxRequest
     }
 
-    if (TTL || TTL === 0) {
-      this.TTL = TTL * 60 * 1000
+    if (timers && (timers.TTL || timers.TTL === 0)) {
+      this.TTL = timers.TTL * 60 * 1000
     }
   }
-  public setItem(key: string, value: any, timers?: ITimers) {
+  public setItem(key: string, value: any, timers?: ITimers): boolean {
     const timersFinal = this.getTimers(timers)
-    const timeoutId = this.createTimeout(key, timersFinal.TTL)
+    let timeoutId: NodeJS.Timeout
+
     this.storage[key] = {
       requestCounter: 0,
       value,
-      timeoutId,
       maxRequest: timersFinal.maxRequest,
     }
+
+    if (timersFinal.TTL !== 0) {
+      timeoutId = this.createTimeout(key, timersFinal.TTL)
+      this.storage[key].timeoutId = timeoutId
+    }
+
     return true
   }
 
-  public getItem(key: string) {
+  public getItem(key: string): any {
     if (!this.storage[key]) {
       return undefined
     }
 
     this.storage[key].requestCounter += 1
     const item = this.storage[key]
-    if (item.requestCounter >= this.storage[key].maxRequest) {
-      this.removeItem(key)
+    if (this.storage[key].maxRequest !== 0) {
+      if (item.requestCounter >= this.storage[key].maxRequest) {
+        this.removeItem(key)
+      }
     }
 
     return item.value
   }
 
-  public hasItem(key: string) {
+  public hasItem(key: string): boolean {
     if (!this.storage[key]) {
       return false
     }
     return true
   }
 
-  public resetItemCounter(key: string, timers?: ITimers) {
+  public resetItemCounter(key: string, timers?: ITimers): boolean {
     if (!this.storage[key]) {
       return false
     }
 
     const timersFinal = this.getTimers(timers)
 
-    clearTimeout(this.storage[key].timeoutId)
+    if (this.storage[key].timeoutId) {
+      clearTimeout(this.storage[key].timeoutId as NodeJS.Timeout)
+      delete this.storage[key].timeoutId
+    }
+    if (timersFinal.TTL !== 0) {
+      this.storage[key].timeoutId = this.createTimeout(key, timersFinal.TTL)
+    }
     this.storage[key].requestCounter = 0
     this.storage[key].maxRequest = timersFinal.maxRequest
-    this.storage[key].timeoutId = this.createTimeout(key, timersFinal.TTL)
     return true
   }
 
-  public removeItem(key: string) {
+  public removeItem(key: string): boolean {
     if (this.storage[key]) {
-      clearTimeout(this.storage[key].timeoutId)
+      if (this.storage[key].timeoutId) {
+        clearTimeout(this.storage[key].timeoutId as NodeJS.Timeout)
+      }
       delete this.storage[key]
     }
     return true
@@ -93,10 +108,10 @@ export class Memory {
     )
   }
 
-  private getTimers(timers?: ITimers) {
+  private getTimers(timers?: ITimers): ITimersFinal {
     const result: ITimersFinal = {
       TTL: this.TTL,
-      maxRequest: this.totalRequests,
+      maxRequest: this.maxRequest,
     }
 
     if (!timers) {
@@ -115,6 +130,6 @@ export class Memory {
   }
 }
 
-const memory = new Memory()
+const metle = new Metle()
 
-export default memory
+export default metle

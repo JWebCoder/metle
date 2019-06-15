@@ -1,53 +1,53 @@
-import { Memory } from '../lib/index'
+import { Metle } from '../lib/index'
 
-const memory = new Memory(2, 1)
+const metle = new Metle({maxRequest: 2, TTL: 1})
 
-describe('Memory storage', () => {
+describe('Metle storage', () => {
 
   it('Should answer false on hasItem if item not present', () => {
-    expect(memory.hasItem('stuff')).toBe(false)
+    expect(metle.hasItem('stuff')).toBe(false)
   })
 
   it('Should answer undefined on getItem if item not present', () => {
-    expect(memory.getItem('stuff')).toBe(undefined)
+    expect(metle.getItem('stuff')).toBe(undefined)
   })
 
   it('Should answer true on setItem', () => {
-    expect(memory.setItem('stuff', 'cool')).toBe(true)
+    expect(metle.setItem('stuff', 'cool')).toBe(true)
   })
 
   it('Should get the item correctly on getItem', () => {
-    expect(memory.getItem('stuff')).toBe('cool')
+    expect(metle.getItem('stuff')).toBe('cool')
   })
 
   it('Should answer true on hasItem if item present', () => {
-    expect(memory.hasItem('stuff')).toBe(true)
+    expect(metle.hasItem('stuff')).toBe(true)
   })
 
   it('Should answer true on resetItemCount if item present', () => {
-    expect(memory.resetItemCounter('stuff')).toBe(true)
-    expect(memory.resetItemCounter('stuff', {TTL: 1})).toBe(true)
+    expect(metle.resetItemCounter('stuff')).toBe(true)
+    expect(metle.resetItemCounter('stuff', {TTL: 1})).toBe(true)
   })
 
   it('Should answer true on removeItem', () => {
-    expect(memory.removeItem('stuff')).toBe(true)
-    expect(memory.removeItem('undefined')).toBe(true)
+    expect(metle.removeItem('stuff')).toBe(true)
+    expect(metle.removeItem('undefined')).toBe(true)
   })
 
   it('Should answer false on resetItemCount if item not present', () => {
-    expect(memory.resetItemCounter('stuff')).toBe(false)
+    expect(metle.resetItemCounter('stuff')).toBe(false)
   })
 
   it('Should remove item after resetCounter is reached', () => {
-    memory.setItem('stuff', true, {maxRequest: 2})
-    memory.getItem('stuff')
-    memory.getItem('stuff')
-    const result = memory.hasItem('stuff')
+    metle.setItem('stuff', true, {maxRequest: 2})
+    metle.getItem('stuff')
+    metle.getItem('stuff')
+    const result = metle.hasItem('stuff')
     expect(result).toBe(false)
   })
 
   it('Item should be remove after TTL', (done) => {
-    memory.setItem('test', true, {TTL: 0})
+    metle.setItem('test', true, {TTL: 0.001})
     return new Promise(
       (res, rej) => {
         setTimeout(
@@ -59,7 +59,31 @@ describe('Memory storage', () => {
       }
     ).then(
       () => {
-        expect(memory.getItem('test')).toBe(undefined)
+        expect(metle.getItem('test')).toBe(undefined)
+        done()
+      }
+    )
+  })
+
+  it('Metle instance without TTL and maxRequest', (done) => {
+    const metleInfinite = new Metle({TTL: 0, maxRequest: 0})
+    metleInfinite.setItem('test', true)
+    expect(metleInfinite.getItem('test')).toBe(true)
+    expect(metleInfinite.resetItemCounter('test')).toBe(true)
+    return new Promise(
+      (res, rej) => {
+        setTimeout(
+          () => {
+            res(true)
+          },
+          1000
+        )
+      }
+    ).then(
+      () => {
+        expect(metleInfinite.getItem('test')).toBe(true)
+        expect(metleInfinite.removeItem('test')).toBe(true)
+        expect(metleInfinite.getItem('test')).toBe(undefined)
         done()
       }
     )
