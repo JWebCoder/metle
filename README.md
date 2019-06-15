@@ -2,6 +2,7 @@
 
 [![Build Status][travis-badge]][travis]
 [![codecov][codecov-badge]][codecov]
+[![Language grade: JavaScript][lgtm-badge]][lgtm]
 ![node][node]
 [![npm version][npm-badge]][npm]
 [![devDependencies Status][dev-dependencies-badge]][dev-dependencies]
@@ -62,6 +63,9 @@ interface ITimers {
 
 [codecov-badge]: https://codecov.io/gh/JWebCoder/metle/branch/master/graph/badge.svg
 [codecov]: https://codecov.io/gh/JWebCoder/metle
+
+[lgtm-badge]: https://img.shields.io/lgtm/grade/javascript/g/JWebCoder/metle.svg?logo=lgtm&logoWidth=18
+[lgtm]: https://lgtm.com/projects/g/JWebCoder/metle/context:javascript
 
 [node]: https://img.shields.io/node/v/metle.svg
 
