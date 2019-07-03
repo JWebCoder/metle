@@ -12,14 +12,14 @@
 **Metle** is a memory storage for NodeJS that supports caching with TTL and maximum number of requests to keep the cache up to date.
 
 ## Install
-```node
+```js
 npm install metle
 ```
 
 ## Usage
 
 **Load the default Metle instance**
-```node
+```js
 import metle from 'metle'
 
 metle.setItem('foo', 'bar')
@@ -28,7 +28,7 @@ const foo = metle.getItem('foo')
 ```
 
 **Create a new Metle instance**
-```node
+```js
 import { Metle } from 'metle'
 
 const metleInstance = new Metle({TTL: 2, maxRequest: 50})
@@ -46,12 +46,12 @@ const foo = metle.getItem('foo')
 - **removeItem**(key: string): boolean
 
 **Metle constructor**
-```node
+```js
   const metle = new Metle(timers?: ITimers)
 ```
 
 **Interface ITimers**
-```node
+```js
 interface ITimers {
   TTL?: number, // default: 10 (min), maximum time to live of an item, 0 for infinite
   maxRequest?: number, // default: 10, maximum number of gets until the item is removed, 0 for infinite

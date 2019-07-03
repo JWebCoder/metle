@@ -1,4 +1,4 @@
-interface ITimers {
+export interface ITimers {
   TTL?: number,
   maxRequest?: number,
 }
