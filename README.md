@@ -41,6 +41,7 @@ const foo = metle.getItem('foo')
 
 - **getItem**(key: string): any
 - **setItem**(key: string, value: any, timers?:ITimers): boolean
+- **updateItem**(key: string, value: any, timers?:ITimers): boolean
 - **hasItem**(key: string): boolean
 - **resetItemCounter**(key: string, timers?: ITimers): boolean
 - **removeItem**(key: string): boolean

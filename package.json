@@ -33,13 +33,13 @@
   },
   "homepage": "https://github.com/JWebCoder/metle#readme",
   "devDependencies": {
-    "@types/jest": "^24.9.1",
-    "@types/node": "^12.12.37",
+    "@types/jest": "^25.2.1",
+    "@types/node": "^13.13.4",
     "codecov": "^3.5.0",
     "jest": "^25.5.4",
-    "rimraf": "^2.7.1",
+    "rimraf": "^3.0.2",
     "ts-jest": "^25.4.0",
-    "tslint": "^5.20.1",
+    "tslint": "^6.1.2",
     "typescript": "^3.8.3"
   }
 }
