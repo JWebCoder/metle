@@ -58,15 +58,16 @@ describe('Metle storage', () => {
   })
 
   it('Should remove item after resetCounter is reached', () => {
-    metle.setItem('stuff', true, {maxRequest: 2})
+    const metleSingleRequest = new Metle({maxRequest: 1})
+    metle.setItem('stuff', true)
     metle.getItem('stuff')
-    metle.getItem('stuff')
-    const result = metle.hasItem('stuff')
+    const result = metleSingleRequest.hasItem('stuff')
     expect(result).toBe(false)
   })
 
   it('Item should be remove after TTL', (done) => {
-    metle.setItem('test', true, {TTL: 0.001})
+    const metleLowTTL = new Metle({TTL: 0.001})
+    metleLowTTL.setItem('test', true)
     return new Promise(
       (res, rej) => {
         setTimeout(
@@ -78,7 +79,7 @@ describe('Metle storage', () => {
       }
     ).then(
       () => {
-        expect(metle.getItem('test')).toBe(undefined)
+        expect(metleLowTTL.getItem('test')).toBe(undefined)
         done()
       }
     )
@@ -86,8 +87,8 @@ describe('Metle storage', () => {
 
   it('Metle instance without TTL and maxRequest', (done) => {
     const metleInfinite = new Metle({TTL: 0, maxRequest: 0})
-    metleInfinite.setItem('test', true)
-    expect(metleInfinite.getItem('test')).toBe(true)
+    metleInfinite.setItem('test', 'test')
+    expect(metleInfinite.getItem('test')).toBe('test')
     expect(metleInfinite.resetItemCounter('test')).toBe(true)
     return new Promise(
       (res, rej) => {
@@ -100,7 +101,7 @@ describe('Metle storage', () => {
       }
     ).then(
       () => {
-        expect(metleInfinite.getItem('test')).toBe(true)
+        expect(metleInfinite.getItem('test')).toBe('test')
         expect(metleInfinite.removeItem('test')).toBe(true)
         expect(metleInfinite.getItem('test')).toBe(undefined)
         done()

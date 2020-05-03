@@ -6,10 +6,6 @@ export interface ITimers {
 interface ITimersFinal {
   TTL: number,
   maxRequest: number,
-  raw: {
-    TTL: number,
-    maxRequest: number,
-  },
 }
 
 interface IStorageItem {
@@ -30,15 +26,17 @@ export class Metle {
     [key: string]: IStorageItem,
   } = {}
   private maxRequest: number = 10
-  private TTL: number = 10 * 60 * 1000 // 10 minutes
+  private TTL: number = 10 // value in minutes
 
   constructor(timers?: ITimers) {
-    if (timers && (timers.maxRequest || timers.maxRequest === 0)) {
-      this.maxRequest = timers.maxRequest
-    }
+    if (timers) {
+      if (timers.maxRequest || timers.maxRequest === 0) {
+        this.maxRequest = timers.maxRequest
+      }
 
-    if (timers && (timers.TTL || timers.TTL === 0)) {
-      this.TTL = timers.TTL * 60 * 1000
+      if (timers.TTL || timers.TTL === 0) {
+        this.TTL = timers.TTL
+      }
     }
   }
   public setItem(key: string, value: any, timers?: ITimers): boolean {
@@ -49,36 +47,25 @@ export class Metle {
       value,
       maxRequest: timersFinal.maxRequest,
       key,
-      TTL: timersFinal.raw.TTL,
+      TTL: timersFinal.TTL,
     }
 
     if (timersFinal.TTL !== 0) {
-      timeoutId = this.createTimeout(key, timersFinal.TTL)
+      timeoutId = this.createTimeout(key, timersFinal.TTL * 60 * 1000)
       this.storage[key].timeoutId = timeoutId
     }
 
     return true
   }
 
-  public updateItem(key: string, value: any, timers?: ITimers): boolean {
+  public updateItem(key: string, value: any, timers: ITimers = {}): boolean {
     if (!this.hasItem(key)) {
       return false
     }
 
     const item = this.storage[key]
 
-    const finalTimers: ITimers = {
-      TTL: item.TTL,
-      maxRequest: item.maxRequest,
-    }
-    if (timers) {
-      if (timers.TTL || timers.TTL === 0) {
-        finalTimers.TTL = timers.TTL
-      }
-      if (timers.maxRequest || timers.maxRequest === 0) {
-        finalTimers.maxRequest = timers.maxRequest
-      }
-    }
+    const finalTimers = this.getTimers(timers, item)
 
     this.internalResetItemCounter(key, finalTimers)
 
@@ -107,12 +94,16 @@ export class Metle {
     return !!this.storage[key]
   }
 
-  public resetItemCounter(key: string, timers?: ITimers): boolean {
+  public resetItemCounter(key: string, timers: ITimers = {}): boolean {
     if (!this.hasItem(key)) {
       return false
     }
 
-    return this.internalResetItemCounter(key, timers)
+    const item = this.storage[key]
+
+    const finalTimers = this.getTimers(timers, item)
+
+    return this.internalResetItemCounter(key, finalTimers)
   }
 
   public removeItem(key: string): boolean {
@@ -122,30 +113,32 @@ export class Metle {
     return true
   }
 
-  private internalResetItemCounter(key: string, timers?: ITimers): boolean {
-    const timersFinal = this.getTimers(timers)
-    const item = this.storage[key]
+  private setItemTimeout(item: IStorageItem, newTTL: number) {
+    const TTLMinutes = newTTL * 60 * 1000
     const timeoutId = item.timeoutId
     if (timeoutId) {
-      if (timersFinal.TTL === 0) {
+      if (newTTL === 0) {
         this.removeItemTimeout(item as IStorageItemWithTimeout)
       } else {
-        if (timersFinal.raw.TTL === item.TTL) {
+        if (newTTL === item.TTL) {
           timeoutId.refresh()
         } else {
           this.removeItemTimeout(item as IStorageItemWithTimeout)
-          item.timeoutId = this.createTimeout(key, timersFinal.TTL)
-          item.TTL = timersFinal.raw.TTL
+          item.timeoutId = this.createTimeout(item.key, TTLMinutes)
+          item.TTL = newTTL
         }
       }
-    } else {
-      if (timersFinal.TTL) {
-        item.timeoutId = this.createTimeout(key, timersFinal.TTL)
-        item.TTL = timersFinal.raw.TTL
-      }
+    } else if (newTTL !== 0) {
+      item.timeoutId = this.createTimeout(item.key, TTLMinutes)
+      item.TTL = newTTL
     }
+  }
+
+  private internalResetItemCounter(key: string, timers: ITimersFinal): boolean {
+    const item = this.storage[key]
+    this.setItemTimeout(item, timers.TTL)
     item.requestCounter = 0
-    item.maxRequest = timersFinal.maxRequest
+    item.maxRequest = timers.maxRequest
     return true
   }
 
@@ -171,28 +164,18 @@ export class Metle {
     )
   }
 
-  private getTimers(timers?: ITimers): ITimersFinal {
+  private getTimers(timers: ITimers = {}, item?: IStorageItem): ITimersFinal {
     const result: ITimersFinal = {
-      TTL: this.TTL,
-      maxRequest: this.maxRequest,
-      raw: {
-        TTL: this.TTL / 1000 / 60 ,
-        maxRequest: this.maxRequest,
-      },
-    }
-
-    if (!timers) {
-      return result
-    }
-
-    if (timers.TTL || timers.TTL === 0) {
-      result.raw.TTL = timers.TTL
-      result.TTL = timers.TTL * 60 * 1000
-    }
-
-    if (timers.maxRequest || timers.maxRequest === 0) {
-      result.raw.maxRequest = timers.maxRequest
-      result.maxRequest = timers.maxRequest
+      TTL: timers.TTL || timers.TTL === 0
+        ? timers.TTL
+        : item
+          ? item.TTL
+          : this.TTL,
+      maxRequest: timers.maxRequest || timers.maxRequest === 0
+        ? timers.maxRequest
+        : item
+          ? item.maxRequest
+          : this.maxRequest,
     }
 
     return result
