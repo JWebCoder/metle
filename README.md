@@ -45,6 +45,10 @@ const foo = metle.getItem('foo')
 - **resetItemCounter**(key: string, timers?: ITimers): boolean
 - **removeItem**(key: string): boolean
 
+**Default timers**
+TTL = 10 (minutes value)
+maxRequest = 0
+
 **Metle constructor**
 ```js
   const metle = new Metle(timers?: ITimers)
@@ -54,7 +58,7 @@ const foo = metle.getItem('foo')
 ```js
 interface ITimers {
   TTL?: number, // default: 10 (min), maximum time to live of an item, 0 for infinite
-  maxRequest?: number, // default: 10, maximum number of gets until the item is removed, 0 for infinite
+  maxRequest?: number, // default: 0, maximum number of gets until the item is removed, 0 for infinite
 }
 ```
 

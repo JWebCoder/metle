@@ -12,6 +12,24 @@ describe('Metle storage', () => {
     expect(metle.getItem('stuff')).toBe(undefined)
   })
 
+  it('updateItem should update both value and timers', () => {
+    expect(metle.setItem('toUpdate', '123', {TTL: 0, maxRequest: 0})).toBe(true)
+    expect(metle.getItem('toUpdate')).toBe('123')
+    expect(metle.updateItem('toUpdate', '124', {TTL: 10, maxRequest: 1})).toBe(true)
+    expect(metle.updateItem('toUpdate', '124', {TTL: 11})).toBe(true)
+    expect(metle.updateItem('toUpdate', '124', {TTL: 0, maxRequest: 0})).toBe(true)
+    expect(metle.updateItem('toUpdate', '124')).toBe(true)
+    expect(metle.updateItem('toUpdate', '124', {TTL: 0})).toBe(true)
+    expect(metle.updateItem('toUpdate', '124', {maxRequest: 1})).toBe(true)
+    expect(metle.getItem('toUpdate')).toBe('124')
+    expect(metle.getItem('toUpdate')).toBe(undefined)
+    expect(metle.removeItem('toUpdate')).toBe(true)
+  })
+
+  it('updateItem should return false if items doesnt exists', () => {
+    expect(metle.updateItem('doNotUpdate', '124', {TTL: 0, maxRequest: 1})).toBe(false)
+  })
+
   it('Should answer true on setItem', () => {
     expect(metle.setItem('stuff', 'cool')).toBe(true)
   })
@@ -26,6 +44,7 @@ describe('Metle storage', () => {
 
   it('Should answer true on resetItemCount if item present', () => {
     expect(metle.resetItemCounter('stuff')).toBe(true)
+    expect(metle.resetItemCounter('stuff', {TTL: 0})).toBe(true)
     expect(metle.resetItemCounter('stuff', {TTL: 1})).toBe(true)
   })
 
