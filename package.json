@@ -13,7 +13,7 @@
     "lint": "tslint src/**/*.ts",
     "build": "npm run lint && npm run clean && tsc",
     "prepublish": "npm run build",
-    "test": "npm run build && jest --coverage --forceExit && codecov"
+    "test": "jest --coverage --forceExit"
   },
   "repository": {
     "type": "git",
