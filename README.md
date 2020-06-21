@@ -18,7 +18,7 @@
 ## Deno import
 
 ```ts
-import metle from "https://deno.land/x/metle/mod.ts";
+import metle from "https://deno.land/x/metle/src/index.ts";
 ```
 
 ## Usage
@@ -28,7 +28,7 @@ import metle from "https://deno.land/x/metle/mod.ts";
 // NodeJS
 import metle from 'metle'
 // Deno
-import metle from 'https://deno.land/x/metle/mod.ts'
+import metle from 'https://deno.land/x/metle/src/index.ts'
 
 metle.setItem('foo', 'bar')
 
@@ -41,7 +41,7 @@ const foo = metle.getItem('foo')
 // NodeJS
 import { Metle } from 'metle'
 // Deno
-import { Metle } from 'https://deno.land/x/metle/mod.ts'
+import { Metle } from 'https://deno.land/x/metle/src/index.ts'
 
 const metleInstance = new Metle({TTL: 2, maxRequest: 50})
 metle.setItem('foo', 'bar')
