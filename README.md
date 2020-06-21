@@ -9,18 +9,26 @@
 [![PRs Welcome][prs-badge]][prs]
 [![GitHub][license-badge]][license]
 
-**Metle** is a memory storage for NodeJS that supports caching with TTL and maximum number of requests to keep the cache up to date.
+**Metle** is a memory storage for NodeJS and Deno that supports caching with TTL and maximum number of requests to keep the cache up to date.
 
-## Install
-```js
-npm install metle
+## NodeJS setup
+
+`npm install metle`
+
+## Deno import
+
+```ts
+import metle from "https://deno.land/x/metle/mod.ts";
 ```
 
 ## Usage
 
 **Load the default Metle instance**
 ```js
+// NodeJS
 import metle from 'metle'
+// Deno
+import metle from 'https://deno.land/x/metle/mod.ts'
 
 metle.setItem('foo', 'bar')
 
@@ -28,8 +36,12 @@ const foo = metle.getItem('foo')
 ```
 
 **Create a new Metle instance**
+
 ```js
+// NodeJS
 import { Metle } from 'metle'
+// Deno
+import { Metle } from 'https://deno.land/x/metle/mod.ts'
 
 const metleInstance = new Metle({TTL: 2, maxRequest: 50})
 metle.setItem('foo', 'bar')

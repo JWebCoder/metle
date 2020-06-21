@@ -25,7 +25,7 @@ export class Metle {
   private storage: {
     [key: string]: IStorageItem,
   } = {}
-  private maxRequest: number = 10
+  private maxRequest: number = 0
   private TTL: number = 10 // value in minutes
 
   constructor(timers?: ITimers) {
