@@ -22,9 +22,7 @@ interface IStorageItemWithTimeout extends IStorageItem {
 }
 
 export class Metle {
-  private storage: {
-    [key: string]: IStorageItem,
-  } = {}
+  private storage: Map<string, IStorageItem> = new Map()
   private maxRequest: number = 0
   private TTL: number = 10 // value in minutes
 
@@ -42,18 +40,18 @@ export class Metle {
   public setItem(key: string, value: any, timers?: ITimers): boolean {
     const timersFinal = this.getTimers(timers)
     let timeoutId: number
-    this.storage[key] = {
+
+    if (timersFinal.TTL !== 0) {
+      timeoutId = this.createTimeout(key, timersFinal.TTL * 60 * 1000) as unknown as number
+    }
+
+    this.storage.set(key, {
       requestCounter: 0,
       value,
       maxRequest: timersFinal.maxRequest,
       key,
       TTL: timersFinal.TTL,
-    }
-
-    if (timersFinal.TTL !== 0) {
-      timeoutId = this.createTimeout(key, timersFinal.TTL * 60 * 1000) as unknown as number
-      this.storage[key].timeoutId = timeoutId
-    }
+    })
 
     return true
   }
@@ -63,7 +61,7 @@ export class Metle {
       return false
     }
 
-    const item = this.storage[key]
+    const item = this.storage.get(key) as IStorageItem
 
     const finalTimers = this.getTimers(timers, item)
 
@@ -79,7 +77,7 @@ export class Metle {
       return undefined
     }
 
-    const item = this.storage[key]
+    const item = this.storage.get(key) as IStorageItem
     if (item.maxRequest !== 0) {
       item.requestCounter += 1
       if (item.requestCounter >= item.maxRequest) {
@@ -91,7 +89,7 @@ export class Metle {
   }
 
   public hasItem(key: string): boolean {
-    return !!this.storage[key]
+    return !!this.storage.has(key)
   }
 
   public resetItemCounter(key: string, timers: ITimers = {}): boolean {
@@ -99,7 +97,7 @@ export class Metle {
       return false
     }
 
-    const item = this.storage[key]
+    const item = this.storage.get(key) as IStorageItem
 
     const finalTimers = this.getTimers(timers, item)
 
@@ -108,7 +106,7 @@ export class Metle {
 
   public removeItem(key: string): boolean {
     if (this.hasItem(key)) {
-      this.deleteFromMemory(key, this.storage[key].timeoutId)
+      this.deleteFromMemory(key, (this.storage.get(key) as IStorageItem).timeoutId)
     }
     return true
   }
@@ -130,7 +128,7 @@ export class Metle {
   }
 
   private internalResetItemCounter(key: string, timers: ITimersFinal): boolean {
-    const item = this.storage[key]
+    const item = this.storage.get(key) as IStorageItem
     this.setItemTimeout(item, timers.TTL)
     item.requestCounter = 0
     item.maxRequest = timers.maxRequest
@@ -147,7 +145,7 @@ export class Metle {
     if (timeoutId) {
       clearTimeout(timeoutId)
     }
-    delete this.storage[key]
+    this.storage.delete(key)
   }
 
   private createTimeout(key: string, TTL: number): number {

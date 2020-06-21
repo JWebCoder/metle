@@ -3,6 +3,10 @@
   "version": "2.0.0",
   "description": "memory storage with ttl and reset after request quantity",
   "main": "lib/index.js",
+  "module": "lib/index.js",
+  "files": [
+    "lib/"
+  ],
   "engines": {
     "node": ">=9.11.1"
   },
