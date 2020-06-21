@@ -1,4 +1,4 @@
-import { Metle } from '../lib/cjs/index'
+import { Metle } from '../lib/index'
 
 const metle = new Metle({maxRequest: 2, TTL: 1})
 

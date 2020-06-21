@@ -2,11 +2,7 @@
   "name": "metle",
   "version": "2.0.0",
   "description": "memory storage with ttl and reset after request quantity",
-  "main": "lib/cjs/index.js",
-  "module": "lib/esm/index.js",
-  "files": [
-    "lib/"
-  ],
+  "main": "lib/index.js",
   "engines": {
     "node": ">=9.11.1"
   },
@@ -15,9 +11,8 @@
     "type-check:watch": "npm run type-check -- --watch",
     "clean": "rimraf lib",
     "lint": "tslint src/**/*.ts",
-    "tsc": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json",
-    "build": "npm run lint && npm run clean && npm run tsc",
-    "prepublish": "npm run build && npm run test",
+    "build": "npm run lint && npm run clean && tsc",
+    "prepublish": "npm run build",
     "test": "jest --coverage --forceExit"
   },
   "repository": {
