@@ -11,21 +11,19 @@ interface ITimersFinal {
 interface IStorageItem {
   requestCounter: number,
   value: any
-  timeoutId?: NodeJS.Timeout,
+  timeoutId?: number,
   maxRequest: number,
   key: string,
   TTL: number,
 }
 
 interface IStorageItemWithTimeout extends IStorageItem {
-  timeoutId: NodeJS.Timeout,
+  timeoutId: number,
 }
 
 export class Metle {
-  private storage: {
-    [key: string]: IStorageItem,
-  } = {}
-  private maxRequest: number = 10
+  private storage: Map<string, IStorageItem> = new Map()
+  private maxRequest: number = 0
   private TTL: number = 10 // value in minutes
 
   constructor(timers?: ITimers) {
@@ -41,19 +39,20 @@ export class Metle {
   }
   public setItem(key: string, value: any, timers?: ITimers): boolean {
     const timersFinal = this.getTimers(timers)
-    let timeoutId: NodeJS.Timeout
-    this.storage[key] = {
+    let timeoutId: number | undefined
+
+    if (timersFinal.TTL !== 0) {
+      timeoutId = this.createTimeout(key, timersFinal.TTL * 60 * 1000) as unknown as number
+    }
+
+    this.storage.set(key, {
       requestCounter: 0,
       value,
       maxRequest: timersFinal.maxRequest,
+      timeoutId,
       key,
       TTL: timersFinal.TTL,
-    }
-
-    if (timersFinal.TTL !== 0) {
-      timeoutId = this.createTimeout(key, timersFinal.TTL * 60 * 1000)
-      this.storage[key].timeoutId = timeoutId
-    }
+    })
 
     return true
   }
@@ -63,7 +62,7 @@ export class Metle {
       return false
     }
 
-    const item = this.storage[key]
+    const item = this.storage.get(key) as IStorageItem
 
     const finalTimers = this.getTimers(timers, item)
 
@@ -79,7 +78,7 @@ export class Metle {
       return undefined
     }
 
-    const item = this.storage[key]
+    const item = this.storage.get(key) as IStorageItem
     if (item.maxRequest !== 0) {
       item.requestCounter += 1
       if (item.requestCounter >= item.maxRequest) {
@@ -91,7 +90,7 @@ export class Metle {
   }
 
   public hasItem(key: string): boolean {
-    return !!this.storage[key]
+    return !!this.storage.has(key)
   }
 
   public resetItemCounter(key: string, timers: ITimers = {}): boolean {
@@ -99,7 +98,7 @@ export class Metle {
       return false
     }
 
-    const item = this.storage[key]
+    const item = this.storage.get(key) as IStorageItem
 
     const finalTimers = this.getTimers(timers, item)
 
@@ -108,7 +107,7 @@ export class Metle {
 
   public removeItem(key: string): boolean {
     if (this.hasItem(key)) {
-      this.deleteFromMemory(key, this.storage[key].timeoutId)
+      this.deleteFromMemory(key, (this.storage.get(key) as IStorageItem).timeoutId)
     }
     return true
   }
@@ -117,17 +116,12 @@ export class Metle {
     const TTLMinutes = newTTL * 60 * 1000
     const timeoutId = item.timeoutId
     if (timeoutId) {
+      this.removeItemTimeout(item as IStorageItemWithTimeout)
       if (newTTL === 0) {
-        this.removeItemTimeout(item as IStorageItemWithTimeout)
-      } else {
-        if (newTTL === item.TTL) {
-          timeoutId.refresh()
-        } else {
-          this.removeItemTimeout(item as IStorageItemWithTimeout)
-          item.timeoutId = this.createTimeout(item.key, TTLMinutes)
-          item.TTL = newTTL
-        }
+        return
       }
+      item.timeoutId = this.createTimeout(item.key, TTLMinutes)
+      item.TTL = newTTL
     } else if (newTTL !== 0) {
       item.timeoutId = this.createTimeout(item.key, TTLMinutes)
       item.TTL = newTTL
@@ -135,7 +129,7 @@ export class Metle {
   }
 
   private internalResetItemCounter(key: string, timers: ITimersFinal): boolean {
-    const item = this.storage[key]
+    const item = this.storage.get(key) as IStorageItem
     this.setItemTimeout(item, timers.TTL)
     item.requestCounter = 0
     item.maxRequest = timers.maxRequest
@@ -148,20 +142,20 @@ export class Metle {
     delete item.timeoutId
   }
 
-  private deleteFromMemory(key: string, timeoutId?: NodeJS.Timeout) {
+  private deleteFromMemory(key: string, timeoutId?: number) {
     if (timeoutId) {
-      clearTimeout(timeoutId as NodeJS.Timeout)
+      clearTimeout(timeoutId)
     }
-    delete this.storage[key]
+    this.storage.delete(key)
   }
 
-  private createTimeout(key: string, TTL: number): NodeJS.Timeout {
+  private createTimeout(key: string, TTL: number): number {
     return setTimeout(
       () => {
         this.removeItem(key)
       },
       TTL
-    )
+    ) as unknown as number
   }
 
   private getTimers(timers: ITimers = {}, item?: IStorageItem): ITimersFinal {
