@@ -39,7 +39,7 @@ export class Metle {
   }
   public setItem(key: string, value: any, timers?: ITimers): boolean {
     const timersFinal = this.getTimers(timers)
-    let timeoutId: number
+    let timeoutId: number | undefined = undefined
 
     if (timersFinal.TTL !== 0) {
       timeoutId = this.createTimeout(key, timersFinal.TTL * 60 * 1000) as unknown as number
@@ -49,6 +49,7 @@ export class Metle {
       requestCounter: 0,
       value,
       maxRequest: timersFinal.maxRequest,
+      timeoutId,
       key,
       TTL: timersFinal.TTL,
     })
