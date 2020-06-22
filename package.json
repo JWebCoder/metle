@@ -1,6 +1,6 @@
 {
   "name": "metle",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "memory storage with ttl and reset after request quantity",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
